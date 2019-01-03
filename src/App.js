@@ -1,41 +1,58 @@
 import React, { Component } from "react";
 import axios from "axios";
 
-import authors from "./data.js";
-
 // Components
 import Sidebar from "./Sidebar";
 import SearchBar from "./SearchBar";
 import AuthorsList from "./AuthorsList";
 import AuthorDetail from "./AuthorDetail";
+import Loading  from "./Loading";
+import { throws } from "assert";
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      authors : [],
       currentAuthor: {},
-      filteredAuthors: []
+      filteredAuthors: [],
+      loading : false ,
     };
-    this.selectAuthor = this.selectAuthor.bind(this);
-    this.unselectAuthor = this.unselectAuthor.bind(this);
-    this.filterAuthors = this.filterAuthors.bind(this);
+     this.selectAuthor = this.selectAuthor.bind(this);
+    // this.unselectAuthor = this.unselectAuthor.bind(this);
+    // this.filterAuthors = this.filterAuthors.bind(this);
+    
+  }
+  componentDidMount(){
+    axios
+    .get("https://the-index-api.herokuapp.com/api/authors/")
+    .then(res => res.data)
+    .then(authorsData => this.setState({ authors: authorsData}))
+    .catch(error => console.log(error));
+
+  }
+  selectAuthor(authorID) {
+    axios
+    .get(`https://the-index-api.herokuapp.com/api/authors/${authorID}/`)
+    .then(res => res.data)
+    .then(author => this.setState({ currentAuthor: author}))
+    .catch(error => console.log(error));
+    
+
   }
 
-  selectAuthor(author) {
-    this.setState({ currentAuthor: author });
-  }
+  // unselectAuthor() {
+  //   this.setState({ currentAuthor: {} });
+  // }
 
-  unselectAuthor() {
-    this.setState({ currentAuthor: {} });
-  }
-
-  filterAuthors(query) {
-    query = query.toLowerCase();
-    let filteredAuthors = authors.filter(author => {
-      return `${author.first_name} ${author.last_name}`.includes(query);
-    });
-    this.setState({ filteredAuthors: filteredAuthors });
-  }
+  // filterAuthors(query) {
+  //   query = query.toLowerCase();
+  //   let filteredAuthors = authors.filter(author => {
+  //     return `${author.first_name} ${author.last_name}`.includes(query);
+  //   });
+  //   this.setState({ filteredAuthors: filteredAuthors });
+  // }
 
   getContentView() {
     if (this.state.currentAuthor.first_name) {
@@ -48,7 +65,7 @@ class App extends Component {
         />
       );
     } else {
-      return <AuthorsList authors={authors} selectAuthor={this.selectAuthor} />;
+      return <AuthorsList loading= {this.state.loading} authors={this.state.authors} selectAuthor={this.selectAuthor} />;
     }
   }
 

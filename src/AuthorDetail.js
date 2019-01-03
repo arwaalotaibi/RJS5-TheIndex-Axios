@@ -4,11 +4,12 @@ import BookRow from "./BookRow";
 class AuthorDetail extends Component {
   render() {
     let author = this.props.author;
-    console.log(author);
-
+ 
     let books = author.books.map(book => (
       <BookRow book={book} key={book.title} author={author} />
     ));
+
+    
 
     return (
       <div className="author col-xs-10">
@@ -30,7 +31,9 @@ class AuthorDetail extends Component {
               <th>Color</th>
             </tr>
           </thead>
-          <tbody>{books}</tbody>
+          <tbody>{books}
+          </tbody>
+                 
         </table>
       </div>
     );
